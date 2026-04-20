@@ -4,3 +4,4 @@
 dataset
 outputs/
 graphic_novel_ai_templates/
+__pycache__/

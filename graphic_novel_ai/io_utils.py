@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -29,7 +29,7 @@ def save_markdown(project_payload: Dict[str, Any], brief: ProjectBrief, output_r
     lines = [
         f"# {brief.title} - Graphic Novel Studio Output",
         "",
-        f"- Generated at: {datetime.utcnow().isoformat()}Z",
+        f"- Generated at: {datetime.now(timezone.utc).isoformat()}",
         f"- Genre: {brief.genre}",
         f"- Tone: {brief.tone}",
         f"- Target Audience: {brief.target_audience}",
