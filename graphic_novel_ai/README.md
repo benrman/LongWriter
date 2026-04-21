@@ -59,6 +59,18 @@ Or run from a JSON brief:
 python -m graphic_novel_ai --brief graphic_novel_ai_templates/brief.example.json --profile rtx3070
 ```
 
+Enable local preview image renders (optional):
+
+```bash
+python -m graphic_novel_ai \
+  --brief graphic_novel_ai_templates/brief.example.json \
+  --profile rtx3070 \
+  --enable-preview-images \
+  --preview-backend automatic1111 \
+  --preview-endpoint http://127.0.0.1:7860 \
+  --preview-max-images 8
+```
+
 ### GUI mode
 
 ```bash
@@ -77,6 +89,10 @@ Artifacts include:
 - `project_bundle.md`
 - `art_prompts.csv` (if art prompt pack is enabled)
 - `production_checklist.md`
+- `graphic_novel.fountain`
+- `graphic_novel.fdx`
+- `storyboard.pdf`
+- `preview_images_manifest.json` (if preview images are enabled)
 
 ## 5) Agent team
 
@@ -97,3 +113,7 @@ The first four run sequentially (dependency chain), and the final three can run 
 - If generation is slow, reduce issue count/pages in the brief.
 - If Ollama is remote, override `ollama_url` in a config JSON and pass `--config`.
 - For quality-first workflows, switch to `--profile high_quality` and ensure sufficient VRAM/RAM headroom.
+- Use `--disable-fountain`, `--disable-fdx`, or `--disable-storyboard-pdf` if you only want core artifacts.
+- Preview image hooks are optional and call local APIs:
+  - Automatic1111: `/sdapi/v1/txt2img`
+  - ComfyUI: `/prompt`, `/history/{id}`, `/view`
