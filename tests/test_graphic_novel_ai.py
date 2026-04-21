@@ -172,6 +172,9 @@ class GraphicNovelStudioTests(unittest.TestCase):
             self.assertIn("markdown", writes)
             self.assertIn("art_prompts_csv", writes)
             self.assertIn("production_checklist", writes)
+            self.assertIn("fountain", writes)
+            self.assertIn("fdx", writes)
+            self.assertIn("storyboard_pdf", writes)
             for path in writes.values():
                 self.assertTrue(path.exists(), f"Expected artifact missing: {path}")
 
@@ -193,6 +196,22 @@ class GraphicNovelStudioTests(unittest.TestCase):
             self.assertEqual(exit_code, 0)
             self.assertTrue((cli_out / "brief.example.json").exists())
             self.assertTrue((cli_out / "config.example.json").exists())
+
+    def test_pipeline_preview_mode_writes_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_root = Path(temp_dir) / "out"
+            cfg = GenerationConfig.from_profile("rtx3070")
+            cfg.output_root = output_root
+            cfg.preview_images_enabled = True
+            cfg.preview_max_images = 0
+            studio = GraphicNovelStudio(config=cfg, backend=FakeBackend())
+
+            brief = ProjectBrief(title="Preview Trial", premise="Test preview manifest with no renders.")
+            _, writes = studio.generate(brief)
+            self.assertIn("preview_manifest", writes)
+            self.assertTrue(writes["preview_manifest"].exists())
+            manifest = json.loads(writes["preview_manifest"].read_text(encoding="utf-8"))
+            self.assertEqual(manifest.get("completed"), 0)
 
 
 if __name__ == "__main__":

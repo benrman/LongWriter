@@ -97,6 +97,41 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("graphic_novel_ai_templates"),
         help="Directory for generated templates.",
     )
+    parser.add_argument(
+        "--enable-preview-images",
+        action="store_true",
+        help="Generate optional storyboard preview images using local image backend.",
+    )
+    parser.add_argument(
+        "--preview-backend",
+        choices=["automatic1111", "comfyui"],
+        help="Image backend for preview generation.",
+    )
+    parser.add_argument(
+        "--preview-endpoint",
+        type=str,
+        help="Base URL for image backend API endpoint.",
+    )
+    parser.add_argument(
+        "--preview-max-images",
+        type=int,
+        help="Maximum number of panel previews to render.",
+    )
+    parser.add_argument(
+        "--disable-fountain",
+        action="store_true",
+        help="Disable Fountain script export.",
+    )
+    parser.add_argument(
+        "--disable-fdx",
+        action="store_true",
+        help="Disable FDX script export.",
+    )
+    parser.add_argument(
+        "--disable-storyboard-pdf",
+        action="store_true",
+        help="Disable storyboard PDF export.",
+    )
     return parser
 
 
@@ -115,6 +150,20 @@ def main(argv: list[str] | None = None) -> int:
         config = GenerationConfig.from_profile(args.profile)
     if args.output_root is not None:
         config.output_root = args.output_root
+    if args.enable_preview_images:
+        config.preview_images_enabled = True
+    if args.preview_backend is not None:
+        config.preview_backend = args.preview_backend
+    if args.preview_endpoint is not None:
+        config.preview_endpoint = args.preview_endpoint
+    if args.preview_max_images is not None:
+        config.preview_max_images = max(0, args.preview_max_images)
+    if args.disable_fountain:
+        config.export_fountain = False
+    if args.disable_fdx:
+        config.export_fdx = False
+    if args.disable_storyboard_pdf:
+        config.export_storyboard_pdf = False
 
     if args.interactive:
         brief = _interactive_brief()
@@ -128,8 +177,8 @@ def main(argv: list[str] | None = None) -> int:
     _, writes = studio.generate(brief)
 
     print("Generation complete.")
-    print(f"JSON output: {writes['json']}")
-    print(f"Markdown output: {writes['markdown']}")
+    for key in sorted(writes):
+        print(f"{key}: {writes[key]}")
     return 0
 
 

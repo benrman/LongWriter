@@ -30,6 +30,10 @@ class GraphicNovelApp(tk.Tk):
         self.output_var = tk.StringVar(value="outputs/graphic_novel_ai")
         self.status_var = tk.StringVar(value="Ready.")
         self.config_path_var = tk.StringVar(value="")
+        self.preview_enabled_var = tk.BooleanVar(value=False)
+        self.preview_backend_var = tk.StringVar(value="automatic1111")
+        self.preview_endpoint_var = tk.StringVar(value="http://127.0.0.1:7860")
+        self.preview_max_var = tk.StringVar(value="6")
 
         self.title_var = tk.StringVar(value="Neon Ashes")
         self.genre_var = tk.StringVar(value="Sci-Fi Fantasy")
@@ -67,6 +71,33 @@ class GraphicNovelApp(tk.Tk):
         ttk.Entry(cfg, textvariable=self.config_path_var).grid(row=0, column=0, sticky=tk.EW, padx=8, pady=6)
         ttk.Button(cfg, text="Load Config", command=self._pick_config).grid(row=0, column=1, padx=8, pady=6)
         cfg.columnconfigure(0, weight=1)
+
+        preview = ttk.LabelFrame(root, text="Optional Storyboard Preview Images")
+        preview.pack(fill=tk.X, pady=(0, 8))
+        ttk.Checkbutton(
+            preview,
+            text="Enable local preview image generation",
+            variable=self.preview_enabled_var,
+        ).grid(row=0, column=0, columnspan=2, sticky=tk.W, padx=8, pady=4)
+        ttk.Label(preview, text="Backend").grid(row=1, column=0, sticky=tk.W, padx=8, pady=4)
+        ttk.Combobox(
+            preview,
+            textvariable=self.preview_backend_var,
+            values=["automatic1111", "comfyui"],
+            state="readonly",
+            width=18,
+        ).grid(row=1, column=1, sticky=tk.W, padx=8, pady=4)
+        ttk.Label(preview, text="Endpoint").grid(row=1, column=2, sticky=tk.W, padx=8, pady=4)
+        ttk.Entry(preview, textvariable=self.preview_endpoint_var, width=34).grid(
+            row=1,
+            column=3,
+            sticky=tk.EW,
+            padx=8,
+            pady=4,
+        )
+        ttk.Label(preview, text="Max images").grid(row=1, column=4, sticky=tk.W, padx=8, pady=4)
+        ttk.Entry(preview, textvariable=self.preview_max_var, width=8).grid(row=1, column=5, sticky=tk.W, padx=8, pady=4)
+        preview.columnconfigure(3, weight=1)
 
         brief_frame = ttk.LabelFrame(root, text="Project Brief")
         brief_frame.pack(fill=tk.BOTH, expand=True)
@@ -239,6 +270,10 @@ class GraphicNovelApp(tk.Tk):
             else:
                 cfg = GenerationConfig.from_profile(self.profile_var.get().strip())
             cfg.output_root = Path(self.output_var.get().strip())
+            cfg.preview_images_enabled = self.preview_enabled_var.get()
+            cfg.preview_backend = self.preview_backend_var.get().strip() or cfg.preview_backend
+            cfg.preview_endpoint = self.preview_endpoint_var.get().strip() or cfg.preview_endpoint
+            cfg.preview_max_images = max(0, int(self.preview_max_var.get().strip() or "0"))
 
             studio = GraphicNovelStudio(cfg)
             _, writes = studio.generate(brief, progress_callback=self._on_progress)
@@ -246,7 +281,9 @@ class GraphicNovelApp(tk.Tk):
                 0,
                 lambda: messagebox.showinfo(
                     "Generation complete",
-                    f"JSON: {writes['json']}\nMarkdown: {writes['markdown']}",
+                    "\n".join(
+                        ["Artifacts:"] + [f"- {key}: {value}" for key, value in sorted(writes.items())]
+                    ),
                 ),
             )
             self.after(0, lambda: self.status_var.set("Done."))

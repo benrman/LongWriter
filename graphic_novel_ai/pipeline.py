@@ -10,9 +10,16 @@ from typing import Any, Callable, Dict, Tuple
 
 from .agents import build_agents
 from .config import GenerationConfig, ProjectBrief
+from .exporters import (
+    save_fdx_script,
+    save_fountain_script,
+    save_storyboard_pdf,
+)
+from .image_hooks import generate_preview_images
 from .io_utils import (
     save_art_prompts_csv,
     save_markdown,
+    save_preview_manifest_json,
     save_production_checklist,
     save_project_json,
 )
@@ -100,5 +107,39 @@ class GraphicNovelStudio:
         if art_csv is not None:
             writes["art_prompts_csv"] = art_csv
         writes["production_checklist"] = save_production_checklist(brief, output_root, slug)
+
+        preview_map: Dict[str, str] = {}
+        if self.config.preview_images_enabled:
+            report("preview_images")
+            preview_map, preview_manifest = generate_preview_images(
+                project_payload=payload,
+                output_root=output_root,
+                slug=slug,
+                backend=self.config.preview_backend,
+                endpoint=self.config.preview_endpoint,
+                max_images=self.config.preview_max_images,
+                width=self.config.preview_width,
+                height=self.config.preview_height,
+                steps=self.config.preview_steps,
+                sampler=self.config.preview_sampler,
+                cfg_scale=self.config.preview_cfg_scale,
+                negative_prompt=self.config.preview_negative_prompt,
+                timeout_seconds=self.config.timeout_seconds,
+                enabled=True,
+            )
+            writes["preview_manifest"] = save_preview_manifest_json(preview_manifest, output_root, slug)
+
+        if self.config.export_fountain:
+            writes["fountain"] = save_fountain_script(payload, brief, output_root, slug)
+        if self.config.export_fdx:
+            writes["fdx"] = save_fdx_script(payload, brief, output_root, slug)
+        if self.config.export_storyboard_pdf:
+            writes["storyboard_pdf"] = save_storyboard_pdf(
+                payload,
+                brief,
+                output_root,
+                slug,
+                preview_manifest=preview_map,
+            )
         report("done")
         return payload, writes

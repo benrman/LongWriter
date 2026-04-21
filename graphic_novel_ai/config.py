@@ -88,6 +88,19 @@ class GenerationConfig:
     include_dialogue_punchup: bool = True
     include_continuity_report: bool = True
     include_art_prompt_pack: bool = True
+    export_fountain: bool = True
+    export_fdx: bool = True
+    export_storyboard_pdf: bool = True
+    preview_images_enabled: bool = False
+    preview_backend: str = "automatic1111"
+    preview_endpoint: str = "http://127.0.0.1:7860"
+    preview_max_images: int = 12
+    preview_width: int = 1024
+    preview_height: int = 1024
+    preview_steps: int = 24
+    preview_sampler: str = "DPM++ 2M Karras"
+    preview_cfg_scale: float = 6.5
+    preview_negative_prompt: str = "blurry, low quality, watermark, text, deformed"
 
     @classmethod
     def from_profile(cls, profile: str) -> "GenerationConfig":

@@ -127,3 +127,11 @@ def save_production_checklist(brief: ProjectBrief, output_root: Path, slug: str)
     ]
     out.write_text("\n".join(checklist), encoding="utf-8")
     return out
+
+
+def save_preview_manifest_json(manifest: Dict[str, Any], output_root: Path, slug: str) -> Path:
+    """Save preview image generation metadata for traceability."""
+    out = output_root / slug / "preview_images_manifest.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(manifest, ensure_ascii=True, indent=2), encoding="utf-8")
+    return out
