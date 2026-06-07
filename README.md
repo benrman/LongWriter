@@ -19,6 +19,7 @@ Left: LongWriter-glm4-9b; Right: GLM-4-9B-chat
 
 ## 🔍 Table of Contents
 - [⚙️ LongWriter Deployment](#deployment)
+- [✍️ Local Creative Studio](#local-creative-studio)
 - [🤖️ AgentWrite](#agentwrite)
 - [🖥️ Model Training](#longwriter-training)
 - [📊 Evaluation](#evaluation)
@@ -47,6 +48,22 @@ You may deploy your own LongWriter chatbot (like the one we show in the teasor v
 CUDA_VISIBLE_DEVICES=0 python trans_web_demo.py
 ```
 Alternatively, you can deploy the model with [vllm](https://github.com/vllm-project/vllm), which allows generating 10,000+ words within a minute! See the code example in [vllm_inference.py](https://github.com/THUDM/LongWriter/blob/main/vllm_inference.py).
+
+<a name="local-creative-studio"></a>
+## ✍️ Local Creative Studio
+
+This repository now includes a local-first creative writing app under [`graphic_novel_ai/`](./graphic_novel_ai/). It combines LongWriter's long-form generation focus with a multi-agent studio for planning, drafting, polishing, and exporting graphic novel projects on your own machine.
+
+Quick start:
+
+```bash
+python3 -m graphic_novel_ai --init-templates
+python3 -m graphic_novel_ai --brief graphic_novel_ai_templates/brief.example.json --profile rtx3070
+```
+
+The studio supports role-based story agents, Ollama model routing, CLI and GUI entrypoints, Markdown/JSON/Fountain/FDX/storyboard PDF exports, and optional local image-preview hooks. See [`graphic_novel_ai/README.md`](./graphic_novel_ai/README.md) for setup and usage.
+
+For the combined LongWriter + Nove AI Local product direction and recommended next features, see [`docs/COHESIVE_APP_ROADMAP.md`](./docs/COHESIVE_APP_ROADMAP.md).
 
 <a name="agentwrite"></a>
 ## 🤖️ AgentWrite
