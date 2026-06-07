@@ -2,6 +2,8 @@
 
 Graphic Novel AI Studio is a local multi-agent pipeline for planning and writing graphic novels on your own machine.
 
+Within the merged LongWriter repository, this package is the local app layer for the broader Nove AI Local direction: LongWriter provides long-form model, training, and evaluation assets, while this studio provides the creator-facing workflow. See [`../docs/COHESIVE_APP_ROADMAP.md`](../docs/COHESIVE_APP_ROADMAP.md) for the combined product roadmap and suggested next features.
+
 It is designed for creators who want:
 
 - Local execution with your own GPU/CPU resources
